@@ -24,9 +24,12 @@ directly -- everything else is controlled from there.
 import os
 import sys
 import logging
+import appengine_django
 
 from appengine_django import InstallAppengineHelperForDjango
-InstallAppengineHelperForDjango()
+if not getattr(appengine_django, '_installed', False):
+  InstallAppengineHelperForDjango()
+  appengine_django._installed = True
 
 from appengine_django import have_django_zip
 from appengine_django import django_zip_path
