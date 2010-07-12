@@ -35,7 +35,7 @@ def start_dev_appserver():
   # hack __main__ so --help in dev_appserver_main works OK.
   sys.modules['__main__'] = dev_appserver_main
   # Set bind ip/port if specified.
-  if len(sys.argv) > 2:
+  if len(sys.argv) > 2 and not sys.argv[2].startswith("--"):
     addrport = sys.argv[2]
     try:
       addr, port = addrport.split(":")
@@ -62,7 +62,17 @@ def start_dev_appserver():
 
   # Pass the application specific datastore location to the server.
   p = get_datastore_paths()
-  args.extend(["--datastore_path", p[0], "--history_path", p[1]])
+  datastore_path = p[0]
+  history_path = p[1]
+
+  if len(sys.argv) > 2:
+    for arg in sys.argv[2:]:
+      if arg.startswith("--datastore_path="):
+        datastore_path=arg[arg.index("=")+1:]
+      elif arg.startswith("--history_path="):
+        history_path = arg[arg.index("=")+1:]
+
+  args.extend(["--datastore_path", datastore_path, "--history_path", history_path])
 
   # Append the current working directory to the arguments.
   dev_appserver_main.main([progname] + args + [os.getcwdu()])

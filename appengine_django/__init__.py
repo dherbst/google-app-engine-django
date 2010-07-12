@@ -395,7 +395,7 @@ def CleanupDjangoSettings(settings):
   app_mods = list(getattr(settings, "INSTALLED_APPS", ()))
   disallowed_apps = (
     'django.contrib.contenttypes',
-    'django.contrib.sites',)
+    )
   for app in app_mods[:]:
     if app in disallowed_apps:
       app_mods.remove(app)
@@ -543,6 +543,8 @@ def InstallAppengineHelperForDjango(version=None):
   InstallModelForm()
   InstallGoogleMemcache()
   InstallDjangoModuleReplacements()
+  InstallSites(settings)
+  InstallFlatpages(settings)
   PatchDjangoSerializationModules(settings)
   CleanupDjangoSettings(settings)
   ModifyAvailableCommands()
@@ -585,6 +587,38 @@ def InstallAuthentication(settings):
   except ImportError:
     logging.debug("No Django authentication support available")
 
+def InstallSites(settings):
+  if "django.contrib.sites" not in settings.INSTALLED_APPS:
+    return
+  try:
+    from appengine_django.contrib.sites import models as helper_models
+    from django.contrib.sites import models
+    models.Site = helper_models.Site
+    logging.debug("Installing sites framework")
+    # this is where the post_syncdb signal would normally happen 
+    if models.Site.all().count() == 0:
+      s = models.Site(id=1, domain='example.com', name='example.com')
+      s.put()
+    # mark as installed
+    models.Site._meta.installed = True
+
+  except ImportError:
+    logging.debug("No Django sites support available")
+
+def InstallFlatpages(settings):
+  if "django.contrib.flatpages" not in settings.INSTALLED_APPS:
+    return
+  try:
+    from appengine_django.contrib.flatpages import models as helper_models
+    from django.contrib.flatpages import models
+    models.FlatPage = helper_models.FlatPage
+    from appengine_django.contrib.flatpages import views as helper_views
+    from django.contrib.flatpages import views
+    views.flatpage = helper_views.flatpage
+    logging.debug("Installing flatpages framework")
+  except ImportError, ex:
+    logging.debug("No Django flatpages support available: %s" % (ex,))
+    
 
 def InstallModelForm():
   """Replace Django ModelForm with the AppEngine ModelForm."""
