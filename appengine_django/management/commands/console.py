@@ -30,9 +30,14 @@ def auth_func():
 class Command(BaseCommand):
   """ Start up an interactive console backed by your app using remote_api """
   
-  help = 'Start up an interactive console backed by your app using remote_api.'
+  help = 'Start up an interactive console backed by your app using remote_api.\n\nUsage: python manage.py console app_id\n'
 
   def run_from_argv(self, argv):
+    if len(argv) < 3:
+      print('Need app_id.\n\nUsage: python manage.py console app_id\n\n')
+      sys.exit(1)
+
+
     app_id = argv[2]
     if len(argv) > 3:
       host = argv[3]
