@@ -70,8 +70,8 @@ class CommandsTest(unittest.TestCase):
     int_sent = False
     fd = subprocess.PIPE
 
-    child = subprocess.Popen([sys.executable, "manage.py", command] + args,
-                             stdin=fd, stdout=fd, stderr=fd, cwd=os.getcwdu())
+    child = subprocess.Popen([sys.executable, "manage.py", command] + args, stdin=fd,
+                             stdout=fd, stderr=fd, cwd=os.getcwdu())
     if input:
       child.stdin.write(input)
       child.stdin.close()

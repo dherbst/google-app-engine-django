@@ -171,6 +171,7 @@ class BaseModel(db.Model):
   # Required for Django 1.1.2 and 1.2.1
   _deferred = False
 
+
   def __eq__(self, other):
     if not isinstance(other, self.__class__):
       return False
@@ -196,6 +197,19 @@ class BaseModel(db.Model):
 
     d = dict([_MakeReprTuple(prop_name) for prop_name in self.properties()])
     return "%s(**%s)" % (self.__class__.__name__, repr(d))
+
+  @classmethod
+  def kind(cls):
+    if hasattr(cls, "Meta") and hasattr(cls.Meta, "db_table"):
+      return cls.Meta.db_table
+    else:
+      return cls.__name__
+
+  @classmethod 
+  def create(cls, **kwargs):
+    obj = cls(**kwargs)
+    obj.save()
+    return obj
 
 
 class RegistrationTestModel(BaseModel):

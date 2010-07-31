@@ -71,8 +71,8 @@ class User(BaseModel):
       return django_user
 
     return cls.get_or_insert(
-        key_name=user.user_id(), user=user, email=user.email(),
-        username=user.nickname())
+      key_name=user.user_id(), user=user, email=user.email(),
+      username=user.nickname())
 
   def set_password(self, raw_password):
     raise NotImplementedError

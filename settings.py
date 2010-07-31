@@ -14,9 +14,11 @@
 
 # Django settings for google-app-engine-django project.
 
-import os
+import os, sys
 
-DEBUG = True
+is_production = not ( os.environ.get('SERVER_SOFTWARE','').lower().startswith('devel') or sys.argv[0].endswith('manage.py') )
+
+DEBUG = not is_production
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -105,5 +107,7 @@ INSTALLED_APPS = (
 #    'django.contrib.auth',
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',
-#    'django.contrib.sites',
+    'django.contrib.sites',
 )
+
+CACHE_BACKEND = "memcached://"
